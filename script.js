@@ -177,7 +177,8 @@ const abi = [
 	}
 ]; 
 
-async function init() {
+
+  async function init() {
     if (!window.ethereum) {
         alert("Please install MetaMask!");
         return;
@@ -188,60 +189,122 @@ async function init() {
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);
 
-    // Submit threat
+    // Validate and submit threat
     document.getElementById("threatForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        const userId = ethers.utils.sha256(ethers.utils.toUtf8Bytes(document.getElementById("userId").value));
-        const threatType = document.getElementById("threatType").value;
-        const threatValue = document.getElementById("threatValue").value;
-        const description = document.getElementById("description").value;
-        const clubTag = document.getElementById("clubTag").value;
+        
+        // Get form values
+        const userId = document.getElementById("userId").value.trim();
+        const threatType = document.getElementById("threatType").value.trim();
+        const threatValue = document.getElementById("threatValue").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const clubTag = document.getElementById("clubTag").value.trim();
+
+        // Validation
+        if (!userId || !threatType || !threatValue || !description || !clubTag) {
+            showError("All fields are required!");
+            return;
+        }
+        if (threatType.length > 50 || threatValue.length > 100 || description.length > 200 || clubTag.length > 50) {
+            showError("Input exceeds maximum length!");
+            return;
+        }
+        if (!/^[a-zA-Z0-9\s.,-]+$/.test(threatType) || !/^[a-zA-Z0-9\s.,-]+$/.test(clubTag)) {
+            showError("Threat Type and Club Tag can only contain letters, numbers, spaces, dots, commas, or hyphens!");
+            return;
+        }
+
+        // Show loading state
+        const submitButton = document.querySelector("#threatForm button");
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
 
         try {
-            const tx = await contract.submitThreat(userId, threatType, threatValue, description, clubTag);
+            const hashedUserId = ethers.utils.sha256(ethers.utils.toUtf8Bytes(userId));
+            const tx = await contract.submitThreat(hashedUserId, threatType, threatValue, description, clubTag);
             await tx.wait();
-            alert("Threat submitted!");
-            loadThreats();
+            showSuccess("Threat submitted successfully!");
+            document.getElementById("threatForm").reset(); // Clear form
+            await loadThreats(); // Refresh table
         } catch (error) {
-            alert("Error: " + error.message);
+            showError("Error submitting threat: " + error.message);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit Threat";
         }
     });
 
     // Load threats
     async function loadThreats() {
         const threatsBody = document.getElementById("threatsBody");
-        threatsBody.innerHTML = "";
-        const count = await contract.getThreatsCount();
-        for (let i = 0; i < count; i++) {
-            const threat = await contract.getThreat(i);
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${threat[0].slice(0, 10)}...</td>
-                <td>${threat[1]}</td>
-                <td>${threat[2]}</td>
-                <td>${threat[3]}</td>
-                <td>${threat[4]}</td>
-                <td>${new Date(threat[5] * 1000).toLocaleString()}</td>
-                <td>${threat[6]}</td>
-                <td><button onclick="vote(${i})">Vote</button></td>
-            `;
-            threatsBody.appendChild(row);
+        threatsBody.innerHTML = "<tr><td colspan='8'>Loading threats...</td></tr>";
+        try {
+            const count = await contract.getThreatsCount();
+            threatsBody.innerHTML = ""; // Clear loading message
+            if (count == 0) {
+                threatsBody.innerHTML = "<tr><td colspan='8'>No threats found.</td></tr>";
+                return;
+            }
+            for (let i = 0; i < count; i++) {
+                const threat = await contract.getThreat(i);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${threat[0].slice(0, 10)}...</td>
+                    <td>${threat[1]}</td>
+                    <td>${threat[2]}</td>
+                    <td>${threat[3]}</td>
+                    <td>${threat[4]}</td>
+                    <td>${new Date(threat[5] * 1000).toLocaleString()}</td>
+                    <td>${threat[6]}</td>
+                    <td><button onclick="vote(${i})">Vote</button></td>
+                `;
+                threatsBody.appendChild(row);
+            }
+        } catch (error) {
+            showError("Error loading threats: " + error.message);
+            threatsBody.innerHTML = "<tr><td colspan='8'>Failed to load threats.</td></tr>";
         }
     }
 
     // Vote for a threat
     window.vote = async (index) => {
+        const voteButton = event.target;
+        voteButton.disabled = true;
+        voteButton.textContent = "Voting...";
         try {
             const tx = await contract.voteThreat(index);
             await tx.wait();
-            alert("Vote recorded!");
-            loadThreats();
+            showSuccess("Vote recorded!");
+            await loadThreats();
         } catch (error) {
-            alert("Error: " + error.message);
+            showError("Error voting: " + error.message);
+        } finally {
+            voteButton.disabled = false;
+            voteButton.textContent = "Vote";
         }
     };
 
-    loadThreats();
+    // Helper functions for user feedback
+    function showError(message) {
+        const errorDiv = document.createElement("div");
+        errorDiv.style.color = "#ff5555";
+        errorDiv.style.margin = "10px 0";
+        errorDiv.textContent = message;
+        document.getElementById("threatForm").prepend(errorDiv);
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+
+    function showSuccess(message) {
+        const successDiv = document.createElement("div");
+        successDiv.style.color = "#55ff55";
+        successDiv.style.margin = "10px 0";
+        successDiv.textContent = message;
+        document.getElementById("threatForm").prepend(successDiv);
+        setTimeout(() => successDiv.remove(), 5000);
+    }
+
+    // Initial load
+    await loadThreats();
 }
 
 init();
