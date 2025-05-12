@@ -72,36 +72,45 @@
         tr:hover {
             background-color: #3a3a6d;
         }
+        .error-message {
+            color: #ff5555;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
     <h1>Cyber Club Threat Sharing</h1>
-    <h2>Submit Threat</h2>
-    <form id="threatForm">
-        <input type="text" id="userId" placeholder="Your ID (e.g., student1)" required><br><br>
-        <input type="text" id="threatType" placeholder="Threat Type (e.g., phishing)" required><br><br>
-        <input type="text" id="threatValue" placeholder="Threat Value (e.g., fakeuni.com)" required><br><br>
-        <input type="text" id="description" placeholder="Description" required><br><br>
-        <input type="text" id="clubTag" placeholder="Club Tag (e.g., uni_phish)" required><br><br>
-        <button type="submit">Submit Threat</button>
-    </form>
-    <h2>Threats</h2>
-    <table id="threatsTable">
-        <thead>
-            <tr>
-                <th>Anonymous ID</th>
-                <th>Type</th>
-                <th>Value</th>
-                <th>Description</th>
-                <th>Club Tag</th>
-                <th>Timestamp</th>
-                <th>Votes</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="threatsBody"></tbody>
-    </table>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <div id="loadingMessage">Loading... Please ensure MetaMask is installed and connected to the Sepolia testnet.</div>
+    <div id="appContent" style="display: none;">
+        <h2>Submit Threat</h2>
+        <form id="threatForm">
+            <input type="text" id="clubCode" placeholder="Club Code (provided by admin)" required><br><br>
+            <input type="text" id="userId" placeholder="Your ID (e.g., student1)" required><br><br>
+            <input type="text" id="threatType" placeholder="Threat Type (e.g., phishing)" required><br><br>
+            <input type="text" id="threatValue" placeholder="Threat Value (e.g., fakeuni.com)" required><br><br>
+            <input type="text" id="description" placeholder="Description" required><br><br>
+            <input type="text" id="clubTag" placeholder="Club Tag (e.g., uni_phish)" required><br><br>
+            <button type="submit">Submit Threat</button>
+        </form>
+        <h2>Threats</h2>
+        <button id="refreshButton">Refresh Threats</button>
+        <table id="threatsTable">
+            <thead>
+                <tr>
+                    <th>Anonymous ID</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                    <th>Club Tag</th>
+                    <th>Timestamp</th>
+                    <th>Votes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="threatsBody"></tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
