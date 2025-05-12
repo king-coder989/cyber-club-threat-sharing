@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Club Threat Sharing</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid black; padding: 10px; text-align: left; }
+        button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Cyber Club Threat Sharing</h1>
+    <h2>Submit Threat</h2>
+    <form id="threatForm">
+        <input type="text" id="userId" placeholder="Your ID (e.g., student1)" required><br><br>
+        <input type="text" id="threatType" placeholder="Threat Type (e.g., phishing)" required><br><br>
+        <input type="text" id="threatValue" placeholder="Threat Value (e.g., fakeuni.com)" required><br><br>
+        <input type="text" id="description" placeholder="Description" required><br><br>
+        <input type="text" id="clubTag" placeholder="Club Tag (e.g., uni_phish)" required><br><br>
+        <button type="submit">Submit Threat</button>
+    </form>
+    <h2>Threats</h2>
+    <table id="threatsTable">
+        <thead>
+            <tr>
+                <th>Anonymous ID</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Description</th>
+                <th>Club Tag</th>
+                <th>Timestamp</th>
+                <th>Votes</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="threatsBody"></tbody>
+    </table>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
