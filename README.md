@@ -1,5 +1,5 @@
 Cyber Club Threat Sharing Platform
-A decentralized platform for anonymously sharing and voting on cyber threats within our college cyber club, built for recruitment project.
+A decentralized platform for anonymously sharing and voting on cyber threats within our college cyber club.
 Features
 
 Submit threats (e.g., malicious IPs, phishing URLs) with club-specific tags.
@@ -16,7 +16,7 @@ Voting system: Members can mark credible threats.
 
 Setup
 
-Open the deployed site: [Vercel URL]
+Open the deployed site: https://cyber-club-threat-sharing.vercel.app
 Connect MetaMask (Sepolia testnet, get test Ether from a faucet).
 Submit and view threats via the web interface.
 
@@ -29,7 +29,7 @@ Repository: All code managed on GitHub.
 Limitations
 
 Requires MetaMask and test Ether.
-Basic UI (intentionally unpolished).
+with Basic UI 
 Gas costs for submissions/votes (free on testnet).
 
 Demo Instructions
